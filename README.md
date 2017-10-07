@@ -7,7 +7,7 @@ logi_prometheus
 
 [Prometheus][prometheus] metrics collector for [logi].
 
-`logi_prometheus` provides counters that count the number of log messages as follows.
+`logi_prometheus` provides counters that count the number of log messages as follows:
 
 ```
 logi_messages_total{sink="sink_name",severity="info",application="app_name",module="mod_name"} 1
