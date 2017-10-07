@@ -1,0 +1,8 @@
+{"1.1.0",
+[{<<"logi">>,{pkg,<<"logi">>,<<"0.5.0">>},0},
+ {<<"prometheus">>,{pkg,<<"prometheus">>,<<"3.4.1">>},0}]}.
+[
+{pkg_hash,[
+ {<<"logi">>, <<"82BF1E971BC89993A1D6567500AE52D03FCA628948EA95CB1D7B8BFCEC4FF9A4">>},
+ {<<"prometheus">>, <<"90C4F37670C4DC7DE9319A0C310BF12CB619715EBE285F583F3B46D955EE8F81">>}]}
+].

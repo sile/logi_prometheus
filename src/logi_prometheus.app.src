@@ -1,0 +1,19 @@
+%% -*- erlang -*-
+{application, logi_prometheus,
+ [{description, "Prometheus metrics collector for logi"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {applications,
+   [
+    kernel,
+    stdlib,
+    logi,
+    prometheus
+   ]},
+  {env,[]},
+  {modules, []},
+
+  {maintainers, ["Takeru Ohta"]},
+  {licenses, ["MIT"]},
+  {links, [{"GitHub","https://github.com/sile/logi_prometheus"}]}
+ ]}.
