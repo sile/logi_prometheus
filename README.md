@@ -7,6 +7,8 @@ logi_prometheus
 
 [Prometheus][prometheus] metrics collector for [logi].
 
+[Documentation](https://hexdocs.pm/logi_prometheus/)
+
 `logi_prometheus` provides counters that count the number of log messages as follows:
 
 ```
@@ -18,11 +20,6 @@ It is useful for detecting anomalies of your application by using [alerting rule
 [logi]: https://github.com/sile/logi
 [prometheus]: https://prometheus.io/
 [alerting rules]: https://prometheus.io/docs/alerting/rules/
-
-Modules
---------
-
-- [logi_prometheus_sink](https://hexdocs.pm/logi_prometheus/logi_prometheus_sink.html)
 
 Examples
 --------
