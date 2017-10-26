@@ -3,6 +3,7 @@ logi_prometheus
 
 [![hex.pm version](https://img.shields.io/hexpm/v/logi_prometheus.svg)](https://hex.pm/packages/logi_prometheus)
 [![Build Status](https://travis-ci.org/sile/logi_prometheus.svg?branch=master)](https://travis-ci.org/sile/logi_prometheus)
+[![Code Coverage](https://codecov.io/gh/sile/logi_prometheus/branch/master/graph/badge.svg)](https://codecov.io/gh/sile/logi_prometheus/branch/master)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 [Prometheus][prometheus] metrics collector for [logi].
