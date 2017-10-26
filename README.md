@@ -1,19 +1,14 @@
 logi_prometheus
 ================
 
-[![hex.pm version](https://img.shields.io/hexpm/v/logi_prometheus.svg)](https://hex.pm/packages/logi_prometheus)
-[![Build Status](https://travis-ci.org/sile/logi_prometheus.svg?branch=master)](https://travis-ci.org/sile/logi_prometheus)
-[![Code Coverage](https://codecov.io/gh/sile/logi_prometheus/branch/master/graph/badge.svg)](https://codecov.io/gh/sile/logi_prometheus/branch/master)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 [Prometheus][prometheus] metrics collector for [logi].
 
-[Documentation](https://hexdocs.pm/logi_prometheus/)
-
 `logi_prometheus` provides counters that count the number of log messages as follows:
 
 ```
-logi_messages_total{sink="sink_name",severity="info",application="app_name",module="mod_name"} 1
+logi_messages_total{logger="logger_name",severity="info",application="app_name",module="mod_name"} 1
 ```
 
 It is useful for detecting anomalies of your application by using [alerting rules].
@@ -28,28 +23,26 @@ Examples
 Basic usage.
 
 ```erlang
-%% Installs `metrics_sink` to the default channel
-> Sink = logi_prometheus_sink:new(metrics_sink, [{registry, example_registry}]).
-> {ok, _} = logi_channel:install_sink(Sink, info).
+%% Installs prometheus backend to the default logger
+> ok = logi_prometheus_backend:install(info).
 
 %% Logs a message
 > logi:info("foo").
 
 %% Prints metrics
-> io:format(prometheus_text_format:format(example_registry)).
+> io:format(prometheus_text_format:format()).
 # TYPE logi_messages_total counter
 # HELP logi_messages_total Messages count
-logi_messages_total{sink="metrics_sink",severity="info",application="stdlib",module="erl_eval"} 1
+logi_messages_total{logger="logi_default_logger",severity="info",application="stdlib",module="erl_eval"} 1
 ```
 
-By using [prometheus_httpd], you can easily expose metrics collected by `logi_prometheus_sink`.
+By using [prometheus_httpd], you can easily expose metrics collected by `logi_prometheus_backend`.
 
 [prometheus_httpd]: https://github.com/deadtrickster/prometheus-httpd
 
 ```erlang
-%% Installs `metrics_sink` to the default channel
-> Sink = logi_prometheus_sink:new(metrics_sink).
-> {ok, _} = logi_channel:install_sink(Sink, info).
+%% Installs prometheus backend to the default logger
+> ok = logi_prometheus_backend:install(info).
 
 %% Starts metrics exporter (i.e., HTTP server)
 > prometheus_httpd:start().
