@@ -9,7 +9,7 @@ basic_test() ->
     error_logger:tty(false), % Suppresses annoying warnings
 
     %% Creates and registers a sink
-    Sink = logi_prometheus_sink:new(test_sink, [{registry, test_registry}]),
+    Sink = logi_prometheus_sink:new(default, [{registry, test_registry}]),
     {ok, _} = logi_channel:install_sink(Sink, info),
     ?assertEqual([prometheus_counter], prometheus_registry:collectors(test_registry)),
 
@@ -30,7 +30,7 @@ basic_test() ->
          [
           "# TYPE logi_messages_total counter\n",
           "# HELP logi_messages_total Messages count\n"
-          "logi_messages_total{sink=\"test_sink\",severity=\"info\",application=\"undefined\",module=\"logi_prometheus_sink_tests\"} 1\n\n"
+          "logi_messages_total{logger=\"default\",severity=\"info\",application=\"undefined\",module=\"logi_prometheus_sink_tests\"} 1\n\n"
          ])),
 
     ok.

@@ -38,40 +38,46 @@
 %% Exported Functions
 %%----------------------------------------------------------------------------------------------------------------------
 %% @equiv new(Id, [])
--spec new(logi_sink:id()) -> logi_sink:sink().
-new(Id) ->
-    new(Id, []).
+-spec new(logi:logger_id()) -> logi_sink:sink().
+new(LoggerId) ->
+    new(LoggerId, []).
 
 %% @doc Creates a new sink instance
 %%
 %% === OPTIONS ===
 %%
+%% <b>sink_id</b>: <br />
+%% - The identifier of this sink. <br />
+%% - The default value is `logi_prometheus_sink'. <br />
+%%
 %% <b>registry</b>: <br />
 %% - The prometheus registry to which metrics will be registered. <br />
 %% - The default value is `default'. <br />
--spec new(logi_sink:id(), Options) -> logi_sink:sink() when
+-spec new(logi:logger_id(), Options) -> logi_sink:sink() when
       Options :: [Option],
-      Option :: {registry, atom()|string()}.
-new(Id, Options) ->
+      Option :: {sink_id, logi_sink:id()} |
+                {registry, atom()|string()}.
+new(LoggerId, Options) ->
+    SinkId = proplists:get_value(sink_id, Options, ?MODULE),
     Registry = proplists:get_value(registry, Options, default),
     prometheus_counter:declare(
       [
        {name, logi_messages_total},
        {help, "Messages count"},
-       {labels, [sink, severity, application, module]},
+       {labels, [logger, severity, application, module]},
        {registry, Registry}
       ]),
-    logi_sink:from_writer(Id, logi_sink_writer:new(?MODULE, {Id, Registry})).
+    logi_sink:from_writer(SinkId, logi_sink_writer:new(?MODULE, {LoggerId, Registry})).
 
 %%----------------------------------------------------------------------------------------------------------------------
 %% 'logi_sink_writer' Callback Functions
 %%----------------------------------------------------------------------------------------------------------------------
 %% @private
-write(Context, _Format, _Data, {SinkId, Registry}) ->
+write(Context, _Format, _Data, {LoggerId, Registry}) ->
     Location = logi_context:get_location(Context),
     Labels =
         [
-         SinkId,
+         LoggerId,
          logi_context:get_severity(Context),
          logi_location:get_application(Location),
          logi_location:get_module(Location)
