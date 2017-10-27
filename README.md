@@ -13,7 +13,7 @@ logi_prometheus
 `logi_prometheus` provides counters that count the number of log messages as follows:
 
 ```
-logi_messages_total{sink="sink_name",severity="info",application="app_name",module="mod_name"} 1
+logi_messages_total{logger="logger_name",severity="info",application="app_name",module="mod_name"} 1
 ```
 
 It is useful for detecting anomalies of your application by using [alerting rules].
