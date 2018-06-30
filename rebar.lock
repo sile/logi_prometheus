@@ -1,8 +1,8 @@
 {"1.1.0",
-[{<<"logi">>,{pkg,<<"logi">>,<<"0.5.1">>},0},
- {<<"prometheus">>,{pkg,<<"prometheus">>,<<"3.4.1">>},0}]}.
+[{<<"logi">>,{pkg,<<"logi">>,<<"0.5.5">>},0},
+ {<<"prometheus">>,{pkg,<<"prometheus">>,<<"4.2.0">>},0}]}.
 [
 {pkg_hash,[
- {<<"logi">>, <<"41E5DDA6A702B41BE765F8C62D8CDED14501E0A6DBDD280CFB78C9F46411248E">>},
- {<<"prometheus">>, <<"90C4F37670C4DC7DE9319A0C310BF12CB619715EBE285F583F3B46D955EE8F81">>}]}
+ {<<"logi">>, <<"EFFA690E0D1B4DB37E17E713356F86E3D90443D77A2B419701B35927FA10854A">>},
+ {<<"prometheus">>, <<"06C58BFDFE28D3168B926DA614CB9A6D39593DEEBDE648A5480E32DFA3C370E9">>}]}
 ].
