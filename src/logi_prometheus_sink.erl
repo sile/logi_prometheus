@@ -28,11 +28,18 @@
 %% Exported API
 %%----------------------------------------------------------------------------------------------------------------------
 -export([new/1, new/2]).
+-export_type([non_neg_milliseconds/0]).
 
 %%----------------------------------------------------------------------------------------------------------------------
 %% 'logi_sink_writer' Callback API
 %%----------------------------------------------------------------------------------------------------------------------
 -export([write/4, get_writee/1]).
+
+%%----------------------------------------------------------------------------------------------------------------------
+%% Types
+%%----------------------------------------------------------------------------------------------------------------------
+-type non_neg_milliseconds() :: non_neg_integer().
+%% Non negative milliseconds.
 
 %%----------------------------------------------------------------------------------------------------------------------
 %% Exported Functions
@@ -53,36 +60,29 @@ new(LoggerId) ->
 %% <b>registry</b>: <br />
 %% - The prometheus registry to which metrics will be registered. <br />
 %% - The default value is `default'. <br />
+%%
+%% <b>initial_delay</b>: <br />
+%% - The delay before the initial value of a metric counted up. <br />
+%% - Until it expired, the value of the metric is set to `0'. <br />
+%% - The default value is `0'. <br />
 -spec new(logi:logger_id(), Options) -> logi_sink:sink() when
       Options :: [Option],
       Option :: {sink_id, logi_sink:id()} |
-                {registry, atom()|string()}.
+                {registry, atom()|string()} |
+                {initial_delay, non_neg_milliseconds()}.
 new(LoggerId, Options) ->
     SinkId = proplists:get_value(sink_id, Options, ?MODULE),
     Registry = proplists:get_value(registry, Options, default),
-    prometheus_counter:declare(
-      [
-       {name, logi_messages_total},
-       {help, "Messages count"},
-       {labels, [logger, severity, application, module]},
-       {registry, Registry}
-      ]),
-    logi_sink:from_writer(SinkId, logi_sink_writer:new(?MODULE, {LoggerId, Registry})).
+    InitialDelay = proplists:get_value(initial_delay, Options, 0),
+    logi_prometheus_counter:declare(Registry),
+    logi_sink:from_writer(SinkId, logi_sink_writer:new(?MODULE, {LoggerId, Registry, InitialDelay})).
 
 %%----------------------------------------------------------------------------------------------------------------------
 %% 'logi_sink_writer' Callback Functions
 %%----------------------------------------------------------------------------------------------------------------------
 %% @private
-write(Context, _Format, _Data, {LoggerId, Registry}) ->
-    Location = logi_context:get_location(Context),
-    Labels =
-        [
-         LoggerId,
-         logi_context:get_severity(Context),
-         logi_location:get_application(Location),
-         logi_location:get_module(Location)
-        ],
-    prometheus_counter:inc(Registry, logi_messages_total, Labels, 1),
+write(Context, _Format, _Data, {LoggerId, Registry, InitialDelay}) ->
+    logi_prometheus_counter:increment(Registry, LoggerId, Context, InitialDelay),
     [].
 
 %% @private

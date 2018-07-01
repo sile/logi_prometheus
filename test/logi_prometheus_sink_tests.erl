@@ -34,3 +34,39 @@ basic_test() ->
          ])),
 
     ok.
+
+initial_delay_test() ->
+    %% Starts application
+    {ok, _} = application:ensure_all_started(logi_prometheus),
+    error_logger:tty(false), % Suppresses annoying warnings
+
+    %% Creates and registers a sink
+    Registry = test_registry2,
+    InitialDelay = 50,
+    Sink = logi_prometheus_sink:new(default, [{registry, Registry}, {initial_delay, InitialDelay}]),
+    {ok, _} = logi_channel:install_sink(Sink, info),
+    ?assertEqual([prometheus_counter], prometheus_registry:collectors(Registry)),
+
+    %% Assertions
+    Labels = [default, info, undefined, logi_prometheus_sink_tests],
+    ?assertEqual(
+       undefined,
+       prometheus_counter:value(Registry, logi_messages_total, Labels)),
+
+    logi:info("foo"),
+    logi:info("bar"),
+    ?assertEqual(
+       0,
+       prometheus_counter:value(Registry, logi_messages_total, Labels)),
+
+    timer:sleep(InitialDelay * 2),
+    ?assertEqual(
+       2,
+       prometheus_counter:value(Registry, logi_messages_total, Labels)),
+
+    logi:info("baz"),
+    ?assertEqual(
+       3,
+       prometheus_counter:value(Registry, logi_messages_total, Labels)),
+
+    ok.
