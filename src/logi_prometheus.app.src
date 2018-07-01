@@ -2,6 +2,7 @@
              [{description,"Prometheus metrics collector for logi"},
               {vsn,"0.1.1"},
               {registered,[]},
+              {mod,{logi_prometheus_app,[]}},
               {applications,[kernel,stdlib,logi,prometheus]},
               {env,[]},
               {modules,[]},
