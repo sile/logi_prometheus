@@ -4,5 +4,5 @@
   0},
  {<<"prometheus">>,
   {git,"https://github.com/deadtrickster/prometheus.erl.git",
-       {ref,"5ce104a5bf95c58894e655229e59c8e3d47364ff"}},
+       {ref,"660a095a1f6b555347580eeeeecab4897b4989ed"}},
   0}].

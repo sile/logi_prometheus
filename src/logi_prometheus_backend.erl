@@ -26,13 +26,21 @@
 %%----------------------------------------------------------------------------------------------------------------------
 %% Exported API
 %%----------------------------------------------------------------------------------------------------------------------
--export([install/1, install/2]).
+-export([install/1, install/2, install_opt/2]).
 -export([uninstall/0, uninstall/1]).
+
+-export_type([non_neg_milliseconds/0]).
 
 %%----------------------------------------------------------------------------------------------------------------------
 %% 'logi_backend' Callback API
 %%----------------------------------------------------------------------------------------------------------------------
 -export([write/5]).
+
+%%----------------------------------------------------------------------------------------------------------------------
+%% Types
+%%----------------------------------------------------------------------------------------------------------------------
+-type non_neg_milliseconds() :: non_neg_integer().
+%% 非負のミリ秒
 
 %%----------------------------------------------------------------------------------------------------------------------
 %% Exported Functions
@@ -47,13 +55,29 @@ install(ConditionSpec) ->
 %% 既に登録の場合は、内容が更新される
 -spec install(logi:logger(), logi_condition:spec()) -> ok.
 install(Logger, ConditionSpec) ->
-    prometheus_counter:declare(
-      [
-       {name, logi_messages_total},
-       {help, "Log messages count"},
-       {labels, [logger, severity, application, module]}
-      ]),
-    BackendSpec = {?MODULE, undefined, ?MODULE, Logger},
+    install_opt(ConditionSpec, [{logger, Logger}]).
+
+%% @doc オプション指定付きで、メトリクス収集用バックエンドをロガーに登録する
+%%
+%% === オプション ===
+%%
+%% `logger'は対象となるロガー。
+%% デフォルト値は`logi:default_logger()'。
+%%
+%% `initial_delay'は、始めて使われたメトリクス(カウンター)の値をインクリメントするまでの遅延。
+%% この値を、Prometheusのメトリクス収集間隔よりの長く設定しておけば、
+%% (例えば)サーバの起動後、初めて発行されたエラーログも、Prometheusの`rate'関数等を用いて検知可能になる。
+%% デフォルトは値は`0'.
+-spec install_opt(logi_condition:spec(), Options) -> ok when
+      Options :: [Option],
+      Option :: {logger, logi:logger()}
+              | {initial_delay, non_neg_milliseconds()}.
+install_opt(ConditionSpec, Options) ->
+    logi_prometheus_counter:declare(default),
+
+    Logger = proplists:get_value(logger, Options, logi:default_logger()),
+    InitialDelay = proplists:get_value(initial_delay, Options, 0),
+    BackendSpec = {?MODULE, undefined, ?MODULE, {Logger, InitialDelay}},
     logi:set_backend(Logger, BackendSpec, ConditionSpec).
 
 %% @equiv uninstall(logi:default_logger())
@@ -73,12 +97,12 @@ uninstall(Logger) ->
 %%----------------------------------------------------------------------------------------------------------------------
 %% @private
 write(Backend, Location, Info, _Format, _Data) ->
-    Logger = logi_backend:get_data(Backend),
-    Labels =
-        [
-         Logger,
-         logi_msg_info:get_severity(Info),
-         logi_location:get_application(Location),
-         logi_location:get_module(Location)
-        ],
-    prometheus_counter:inc(logi_messages_total, Labels, 1).
+    {Logger, InitialDelay} = logi_backend:get_data(Backend),
+    Key = {
+           default,
+           Logger,
+           logi_msg_info:get_severity(Info),
+           logi_location:get_application(Location),
+           logi_location:get_module(Location)
+          },
+    logi_prometheus_counter:increment(Key, InitialDelay).
