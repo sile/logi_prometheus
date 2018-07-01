@@ -1,6 +1,6 @@
 {application,logi_prometheus,
              [{description,"Prometheus metrics collector for logi"},
-              {vsn,"0.1.1"},
+              {vsn,"0.1.2"},
               {registered,[]},
               {mod,{logi_prometheus_app,[]}},
               {applications,[kernel,stdlib,logi,prometheus]},
